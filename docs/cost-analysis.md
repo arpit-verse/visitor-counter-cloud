@@ -28,24 +28,24 @@ The following table contrasts the baseline unoptimized setup against the optimiz
 
 ---
 
-## 3. Projected Cloud Cost Model (Hypothetical AWS EKS / GCP GKE)
+## 3. Resource Allocation and Cost Impact
 
-> **Disclaimer:** The financial figures below represent an academic projection based on public cloud hourly compute pricing (e.g., standard micro/small compute instances at \$0.04/vCPU-hour and \$0.005/GB-RAM-hour). Measured local metrics are strictly technical.
+The following comparison illustrates the reduction in allocated Kubernetes resources through right-sizing and autoscaling. These figures represent configured resource allocations, not actual cloud billing measurements.
 
-### Baseline Cost Scenario (Static 6 Replicas Overprovisioned)
-- **vCPU Allocations:** 6 replicas $\times$ 0.5 vCPU = 3.0 vCPU $\times$ 730 hrs/month $\times$ \$0.04 = **\$87.60/month**
-- **RAM Allocations:** 6 replicas $\times$ 0.5 GB = 3.0 GB $\times$ 730 hrs/month $\times$ \$0.005 = **\$10.95/month**
-- **Container Registry Storage & Egress:** ~1.02 GB image pulls $\times$ frequent deployments = **\$5.20/month**
-- **Total Estimated Baseline Cost:** **\$103.75 / month**
+| Resource | Baseline Scenario | Optimized Scenario | Impact |
+|---|---:|---:|---|
+| Flask replicas during idle periods | 6 | 2 | 66.7% fewer replicas |
+| CPU requests | 3.0 vCPU | 0.2 vCPU | 2.8 vCPU lower requested capacity |
+| Memory requests | Based on baseline assumption of 256 MiB per replica | 256 MiB total | Lower reserved memory |
+| CPU limits | 3.0 vCPU | 1.0 vCPU | Reduced maximum configured capacity |
+| Container image size | 1,020 MB | 145 MB | 85.8% reduction |
 
-### Optimized Cost Scenario (HPA Elastic 2 Replicas with Burst)
-Assuming 18 hours of low traffic (2 replicas) and 6 hours of peak load (average 4 replicas):
-- **Average Active Replicas:** $(18 \times 2 + 6 \times 4) / 24 = 2.5\text{ replicas}$
-- **vCPU Allocations:** 2.5 replicas $\times$ 0.1 vCPU (base) to 0.3 vCPU (avg) $\approx$ 0.6 vCPU avg $\times$ 730 hrs $\times$ \$0.04 = **\$17.52/month**
-- **RAM Allocations:** 2.5 replicas $\times$ 0.15 GB avg = 0.375 GB $\times$ 730 hrs $\times$ \$0.005 = **\$1.37/month**
-- **Container Registry Storage & Egress:** ~145 MB image = **\$0.80/month**
-- **Total Estimated Optimized Cost:** **\$19.69 / month**
+### Cost Optimization Interpretation
 
-### Net Savings
-- **Monthly Savings:** **\$84.06 / month**
-- **Relative Cost Reduction:** **~81% cost decrease**
+1. **Image optimization:** Smaller container images reduce registry storage requirements and image transfer volume.
+2. **Resource right-sizing:** Explicit CPU and memory requests and limits improve resource allocation and reduce unnecessary reservation.
+3. **Horizontal Pod Autoscaling:** The application scales from 2 replicas to 4 during the demonstrated load test and returns to 2 replicas after the load ends.
+
+These optimizations can reduce infrastructure expenditure in a cloud environment. Actual monetary savings depend on the cloud provider, region, instance pricing, storage charges and workload duration. No real cloud billing measurements were performed because this project uses a local Minikube environment.
+
+The financial impact is therefore discussed qualitatively rather than presented as an actual cloud cost reduction.
