@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: visitor-app
+  labels:
+    app: visitor-counter
+    environment: production

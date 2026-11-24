@@ -1,0 +1,22 @@
+﻿=====================================================
+KUBERNETES SELF-HEALING AUTOMATION TEST
+=====================================================
+
+[STEP 1] Listing running pods before failure injection:
+NAME                                READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+flask-deployment-678d5f95cf-gfrq5   1/1     Running   0          43m   10.244.0.5   minikube   <none>           <none>
+flask-deployment-678d5f95cf-kwpkr   1/1     Running   0          37m   10.244.0.6   minikube   <none>           <none>
+
+[STEP 2] Simulating pod failure - Deleting target pod: flask-deployment-678d5f95cf-gfrq5
+pod "flask-deployment-678d5f95cf-gfrq5" deleted from visitor-app namespace
+
+[STEP 3] Immediate state after pod deletion (ReplicaSet spins up new pod):
+NAME                                READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+flask-deployment-678d5f95cf-j2b2s   0/1     Running   0          5s    10.244.0.7   minikube   <none>           <none>
+flask-deployment-678d5f95cf-kwpkr   1/1     Running   0          37m   10.244.0.6   minikube   <none>           <none>
+
+[STEP 4] Fully reconciled state (Replacement pod Ready, exactly 2 replicas restored):
+NAME                                READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+flask-deployment-678d5f95cf-j2b2s   1/1     Running   0          17s   10.244.0.7   minikube   <none>           <none>
+flask-deployment-678d5f95cf-kwpkr   1/1     Running   0          37m   10.244.0.6   minikube   <none>           <none>
+

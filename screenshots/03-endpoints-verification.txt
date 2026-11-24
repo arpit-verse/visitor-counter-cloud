@@ -1,0 +1,8 @@
+﻿=== GET /health ===
+{"environment":"Kubernetes Cluster (Production)","hostname":"flask-deployment-678d5f95cf-gfrq5","status":"healthy","uptime_seconds":2309}
+
+=== GET /ready ===
+{"hostname":"flask-deployment-678d5f95cf-gfrq5","redis":"connected","redis_host":"redis-service","status":"ready"}
+
+=== GET /metrics ===
+{"app_uptime_seconds":2309,"environment":"Kubernetes Cluster (Production)","hostname":"flask-deployment-678d5f95cf-gfrq5","redis_connected":true,"total_visitors":5}

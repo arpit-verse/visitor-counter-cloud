@@ -1,0 +1,20 @@
+# Unoptimized base image (Full Python with build tools and extraneous OS packages)
+FROM python:3.11
+
+WORKDIR /app
+
+# No multi-stage build, no package cache cleanup, root user execution
+COPY app/requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY app/ /app/
+
+ENV PYTHONUNBUFFERED=1 \
+    PORT=5000 \
+    REDIS_HOST=redis \
+    REDIS_PORT=6379 \
+    ENVIRONMENT_NAME="Unoptimized Image"
+
+EXPOSE 5000
+
+CMD ["python", "app.py"]

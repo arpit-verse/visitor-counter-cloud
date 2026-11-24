@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Visitor Counter | Flask + Redis on Kubernetes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="badge-row">
+                <span class="badge badge-env">{{ environment }}</span>
+                <span class="badge badge-version">{{ version }}</span>
+                {% if redis_connected %}
+                    <span class="badge badge-success">● Redis Connected</span>
+                {% else %}
+                    <span class="badge badge-danger">● Redis Disconnected</span>
+                {% endif %}
+            </div>
+            <h1>Cloud-Native Visitor Counter</h1>
+            <p class="subtitle">Scalable, Containerized Microservice Architecture deployed on Kubernetes</p>
+        </header>
+
+        <!-- Main Counter Hero Card -->
+        <div class="counter-card">
+            <div class="counter-label">TOTAL VISITOR COUNT</div>
+            <div class="counter-number">{{ visitor_count }}</div>
+            <div class="counter-note">
+                Atomic counter incremented using Redis <code>INCR</code> operation on page load.
+            </div>
+            <button class="btn-refresh" onclick="window.location.reload();">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                Refresh to Increment Count
+            </button>
+        </div>
+
+        {% if error_message %}
+        <div class="alert alert-error">
+            <strong>Connection Warning:</strong> {{ error_message }}
+        </div>
+        {% endif %}
+
+        <!-- Infrastructure & Runtime Telemetry -->
+        <div class="telemetry-grid">
+            <div class="card">
+                <div class="card-title">Serving Pod / Host</div>
+                <div class="card-value highlight-host">{{ hostname }}</div>
+                <div class="card-desc">Load balanced across active Flask replicas</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Database Backend</div>
+                <div class="card-value">{{ redis_host }}:{{ redis_port }}</div>
+                <div class="card-desc">In-memory persistent key-value store</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Application Health</div>
+                <div class="card-value status-healthy">
+                    <span class="pulse-dot"></span> Healthy
+                </div>
+                <div class="card-desc">Liveness & Readiness Probes Active</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Instance Uptime</div>
+                <div class="card-value">{{ uptime_seconds }}s</div>
+                <div class="card-desc">Continuous service availability</div>
+            </div>
+        </div>
+
+        <!-- Architecture & Technology Breakdown -->
+        <div class="info-section">
+            <h2>System Architecture & Integration Details</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <h3>1. Containerization (Docker)</h3>
+                    <p>Python 3.11-slim optimized multi-stage build running Gunicorn/Flask WSGI server. Completely stateless application layer.</p>
+                </div>
+                <div class="info-item">
+                    <h3>2. Redis In-Memory State</h3>
+                    <p>Acts as the centralized shared state across all replicas. Atomic <code>INCR visitor_count</code> prevents race conditions under high concurrency.</p>
+                </div>
+                <div class="info-item">
+                    <h3>3. Kubernetes Orchestration</h3>
+                    <p>Multi-replica Deployment with ClusterIP & NodePort services. Automatic self-healing reconciles pods upon crash or termination.</p>
+                </div>
+                <div class="info-item">
+                    <h3>4. Horizontal Pod Autoscaler (HPA)</h3>
+                    <p>Monitors CPU utilization via Metrics Server. Dynamically scales Flask pods from 2 to 6 replicas when load exceeds 50% CPU.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Endpoints Quick Reference -->
+        <div class="api-section">
+            <h3>Verified Observability Endpoints</h3>
+            <div class="api-links">
+                <a href="/" class="api-pill">GET / (Dashboard)</a>
+                <a href="/health" target="_blank" class="api-pill">GET /health (Liveness)</a>
+                <a href="/ready" target="_blank" class="api-pill">GET /ready (Readiness)</a>
+                <a href="/metrics" target="_blank" class="api-pill">GET /metrics (Telemetry)</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Cloud Computing Final Project Submission &bull; Flask &bull; Redis &bull; Docker &bull; Kubernetes &bull; HPA</p>
+        </footer>
+    </div>
+</body>
+</html>
