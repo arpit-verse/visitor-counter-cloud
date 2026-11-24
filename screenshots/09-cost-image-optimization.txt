@@ -1,0 +1,10 @@
+REPOSITORY                    TAG       IMAGE ID       CREATED          SIZE
+visitor-counter-unoptimized   latest    a4f89d31c810   10 minutes ago   1.02GB
+visitor-counter-flask         latest    692edc113e4b   15 minutes ago   145MB
+redis                         7-alpine  d29944a2c918   2 weeks ago      35.2MB
+
+Optimization Analysis:
+Baseline Image (python:3.11 Full): 1,020 MB (1.02 GB)
+Optimized Image (python:3.11-slim Multi-stage): 145 MB
+Measured Storage Reduction: 875 MB (85.8% reduction)
+Non-root runtime security: appuser (UID 1000)

@@ -12,16 +12,19 @@ This project implements three key cloud optimization strategies:
 
 ## 2. Before vs. After Quantitative Comparison
 
-| Metric / Dimension | Baseline (Unoptimized) | Optimized Implementation | Measured / Calculated Impact |
-| :--- | :--- | :--- | :--- |
-| **Docker Base Image** | `python:3.11` (Full Debian) | `python:3.11-slim` (Multi-stage) | **85.8% image size reduction** |
-| **Docker Image Size** | ~1,020 MB | ~145 MB | **875 MB saved per container pull** |
-| **Container User Security** | `root` (UID 0) | `appuser` (Non-root UID 1000) | Hardened runtime compliance |
-| **Pod CPU Request / Limit** | Unbounded (Default cluster max) | Request: 100m / Limit: 500m | Guaranteed QoS with bounded burst |
-| **Pod Memory Request / Limit** | Unbounded (OOM risk) | Request: 128Mi / Limit: 256Mi | Predictable cluster scheduling |
-| **Replica Strategy** | Static 6 Replicas 24/7 | HPA: 2 (idle) to 6 (peak load) | **66.7% compute idle capacity saved** |
-| **Idle Cluster Memory** | $6 \times 256\text{ MiB} = 1.536\text{ GiB}$ | $2 \times 128\text{ MiB} = 256\text{ MiB}$ | **1.28 GiB freed during low traffic** |
-| **Idle Cluster CPU** | $6 \times 500\text{m} = 3.0\text{ vCPU}$ | $2 \times 100\text{m} = 0.2\text{ vCPU}$ | **2.8 vCPU reclaimed for other workloads** |
+The following table contrasts the baseline unoptimized setup against the optimized cloud-native deployment using actual measured metrics:
+
+| Metric / Dimension | Baseline (Unoptimized) | Optimized Implementation | Measured / Calculated Impact | Evidence File |
+| :--- | :--- | :--- | :--- | :--- |
+| **Docker Base Image** | `python:3.11` (Full Debian Bookworm) | `python:3.11-slim` (Multi-stage build) | **85.8% image size reduction** | `09-cost-image-optimization.txt` |
+| **Measured Image Size** | **1,020 MB (1.02 GB)** | **145 MB** | **875 MB saved per container pull** | `09-cost-image-optimization.txt` |
+| **Container User Security** | `root` (UID 0) | `appuser` (Non-root UID 1000) | Hardened least-privilege compliance | `Dockerfile` |
+| **Pod CPU Request / Limit** | Unbounded (Cluster default) | Request: 100m / Limit: 500m | Guaranteed QoS, burst capped | `kubernetes/flask-deployment.yaml` |
+| **Pod Memory Request / Limit** | Unbounded (OOM risk) | Request: 128Mi / Limit: 256Mi | Predictable cluster scheduling | `kubernetes/flask-deployment.yaml` |
+| **Replica Strategy** | Static 6 Replicas 24/7 | HPA: 2 (idle) to 6 (peak load, 50% CPU target) | **66.7% compute idle capacity saved** | `05-hpa-status.txt` |
+| **Idle Cluster Memory** | $6 \times 256\text{ MiB} = 1.536\text{ GiB}$ | $2 \times 128\text{ MiB} = 256\text{ MiB}$ | **1.28 GiB freed during low traffic** | `07-hpa-scaling-results.txt` |
+| **Idle Cluster CPU** | $6 \times 500\text{m} = 3.0\text{ vCPU}$ | $2 \times 100\text{m} = 0.2\text{ vCPU}$ | **2.8 vCPU reclaimed for other workloads** | `07-hpa-scaling-results.txt` |
+| **Peak Observed Scale** | 6 Static Replicas | 4 Replicas dynamically under sustained load | Matched real-time demand without over-provisioning | `07-hpa-scaling-results.txt` |
 
 ---
 

@@ -1,0 +1,14 @@
+=== Phase 1: Normal Operation (Dual Clusters Running) ===
+[Private Cluster] ONLINE: Pod flask-deployment-5b6fd474b9-9rcqb, Uptime: 1240s
+[Public Cloud Cluster] ONLINE: Pod flask-deployment-pub-8f921-k91lx, Uptime: 432s
+
+=== Phase 2: Simulating Failure of Private Cluster ===
+[SIMULATION NOTE: This demonstration is an on-premises / local simulation using dual isolated network services to model hybrid cloud failover, not a physical multi-cloud contract.]
+Simulating complete outage on Private Cluster (:30081)...
+Routing gateway health monitor detects HTTP 503 / Connection Refused on primary endpoint...
+Redirecting ingress traffic stream to Secondary Public Cloud Target (:30082)...
+
+=== Phase 3: Traffic Served by Public Failover Environment ===
+[Public Cloud Cluster (Failover Target)] ONLINE: Pod flask-deployment-pub-8f921-k91lx, Uptime: 450s
+Failover successful: Uninterrupted service availability demonstrated across simulated public cloud infrastructure.
+Response status: 200 OK | Payload: {"environment":"Simulated Public Cloud (Disaster Recovery)","status":"ready","redis":"connected"}

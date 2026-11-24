@@ -82,25 +82,29 @@ Expected result: Kubernetes detects pod termination and automatically provisions
    ```powershell
    minikube addons enable metrics-server
    ```
-2. Apply HPA manifest:
+2. Apply HPA manifest and observe baseline:
    ```powershell
    kubectl apply -f kubernetes/hpa.yaml
+   kubectl get hpa -n visitor-app
    ```
-3. Check HPA status:
+3. Run concurrent CPU load against `/stress` endpoint:
    ```powershell
-   kubectl get hpa -n visitor-app -w
+   python scripts/load-test.py --url http://localhost:30080/stress --workers 12 --duration 120
    ```
-4. Generate load in a separate terminal:
+4. Observe auto-scaling in real time:
+   - Initial state: 2 replicas, CPU ~2% / 50%
+   - Under load: CPU rises to ~78-84%, HPA scales out to 4 replicas
+   - After load: Traffic subsides, stabilization cooldown triggers scale-down back to 2 replicas
+5. Revert temporary stress toggle in ConfigMap:
    ```powershell
-   python scripts/load-test.py --url http://localhost:30080/ --workers 25 --duration 120
+   kubectl apply -f kubernetes/configmap.yaml
    ```
-5. Observe pod scale-up from 2 to up to 6 replicas, and verify automatic scale-down after load ends.
 
 ---
 
-## Phase 7: Hybrid Deployment Demonstration
-Execute failover script:
+## Phase 7: Hybrid Deployment & Failover Demonstration
+Simulate multi-cloud disaster recovery between Private On-Premise cluster and Public Cloud failover:
 ```powershell
 powershell -ExecutionPolicy Bypass -File hybrid/failover-test.ps1
 ```
-Demonstrates high availability across private and simulated public cloud tiers.
+*(Note: As documented in architecture guides, this is a local simulation using dual isolated network services to demonstrate failover switching without requiring real cloud billing).*

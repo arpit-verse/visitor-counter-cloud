@@ -1,0 +1,14 @@
+NAME        REFERENCE                     TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+flask-hpa   Deployment/flask-deployment   cpu: 2%/50%   2         6         2          8h
+
+Pod status before test:
+NAME                                READY   STATUS    RESTARTS   AGE
+flask-deployment-5b6fd474b9-9rcqb   1/1     Running   0          11m
+flask-deployment-5b6fd474b9-vn5hp   1/1     Running   0          10m
+redis-deployment-645f45cccd-z8qdf   1/1     Running   0          10h
+
+Pod Resource Utilization Baseline:
+NAME                                CPU(cores)   MEMORY(bytes)
+flask-deployment-5b6fd474b9-9rcqb   3m           68Mi
+flask-deployment-5b6fd474b9-vn5hp   2m           69Mi
+redis-deployment-645f45cccd-z8qdf   17m          3Mi

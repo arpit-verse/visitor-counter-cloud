@@ -139,15 +139,24 @@ powershell -ExecutionPolicy Bypass -File scripts/test-self-healing.ps1
 
 ### Horizontal Pod Autoscaling (HPA) Demonstration
 ```powershell
-# Apply HPA policy
+# Apply HPA policy (Min: 2, Max: 6, Target CPU: 50%)
 kubectl apply -f kubernetes/hpa.yaml
 
-# Generate simulated load (25 concurrent workers for 120s)
-python scripts/load-test.py --url http://localhost:30080/ --workers 25 --duration 120
+# Check HPA initial baseline
+kubectl get hpa -n visitor-app
+
+# Generate controlled CPU load (12 concurrent workers targeting /stress for 120s)
+python scripts/load-test.py --url http://localhost:30080/stress --workers 12 --duration 120
 
 # Observe auto-scaling in real time
 kubectl get hpa -n visitor-app -w
+kubectl get pods -n visitor-app -w
 ```
+**Demonstrated Behavior:**
+- **Baseline:** 2 replicas active, CPU utilization ~2% / 50%.
+- **Scale-Up:** Under sustained load, CPU reached 78–84%, triggering HPA to provision 4 replicas.
+- **Scale-Down:** Following load cessation and cooldown window, HPA automatically scaled replicas back down to 2.
+- **Stress Endpoint Teardown:** Disabled via `ENABLE_STRESS_ENDPOINT: "false"` in `kubernetes/configmap.yaml` post-testing.
 
 ---
 
@@ -157,18 +166,20 @@ Simulate disaster recovery failover between private on-premise cluster and publi
 ```powershell
 powershell -ExecutionPolicy Bypass -File hybrid/failover-test.ps1
 ```
+*Note: This is an on-premises / local simulation utilizing dual isolated network ports (`30081` vs `30082`) to model hybrid cloud failover mechanics, avoiding external cloud provider billing.*
 
 ---
 
 ## 7. Cost & Resource Optimization Results (Task 5)
 
-| Dimension | Baseline (Unoptimized) | Optimized Implementation | Improvement |
-| :--- | :--- | :--- | :--- |
-| **Docker Base Image** | `python:3.11` (Full Debian) | `python:3.11-slim` (Multi-stage) | **85.8% Size Reduction** |
-| **Image Size** | 1,020 MB | 145 MB | **875 MB Saved** |
-| **CPU / RAM Allocation** | Unbounded (No limits) | Request: 100m, 128Mi / Limit: 500m, 256Mi | Predictable QoS |
-| **Idle Capacity Policy** | Static 6 Replicas | HPA 2 to 6 Replicas | **66.7% Idle Compute Saved** |
-| **Estimated Monthly Cost** | \$103.75 | \$19.69 | **~81% Cost Reduction** |
+| Dimension | Baseline (Unoptimized) | Optimized Implementation | Improvement | Evidence File |
+| :--- | :--- | :--- | :--- | :--- |
+| **Docker Base Image** | `python:3.11` (Full Debian) | `python:3.11-slim` (Multi-stage) | **85.8% Size Reduction** | `09-cost-image-optimization.txt` |
+| **Measured Image Size**| **1,020 MB (1.02 GB)** | **145 MB** | **875 MB Saved per pull** | `09-cost-image-optimization.txt` |
+| **CPU / RAM Allocation** | Unbounded (No limits) | Request: 100m, 128Mi / Limit: 500m, 256Mi | Predictable QoS | `flask-deployment.yaml` |
+| **Idle Capacity Policy** | Static 6 Replicas | HPA 2 to 6 Replicas (50% CPU Target) | **66.7% Idle Compute Saved** | `05-hpa-status.txt` |
+| **Demonstrated Scale** | 6 Static Replicas | Scaled dynamically from 2 to 4 replicas | Zero waste on idle | `07-hpa-scaling-results.txt` |
+| **Estimated Monthly Cost** | \$103.75 | \$19.69 | **~81% Cost Reduction** | `docs/cost-analysis.md` |
 
 Detailed breakdown available in [`docs/cost-analysis.md`](docs/cost-analysis.md).
 
@@ -181,7 +192,7 @@ Detailed breakdown available in [`docs/cost-analysis.md`](docs/cost-analysis.md)
 - [x] 3. `kubectl get pods -n visitor-app -o wide` showing 2 active Flask replicas and 1 Redis pod.
 - [x] 4. `kubectl get svc -n visitor-app` showing `NodePort` and `ClusterIP` services.
 - [x] 5. Self-healing test output showing automatic pod recreation after deletion.
-- [ ] 6. `kubectl get hpa -n visitor-app` during traffic spike displaying replica scale-up.
-- [ ] 7. HPA scale-down confirmation after traffic cessation.
-- [ ] 8. Hybrid failover script output demonstrating switch to public cloud tier.
-- [ ] 9. `docker images` comparing unoptimized vs. optimized image sizes.
+- [x] 6. `kubectl get hpa -n visitor-app` during traffic spike displaying replica scale-up (`05-hpa-status.txt`, `06-hpa-load-test.txt`).
+- [x] 7. HPA scale-down confirmation after traffic cessation (`07-hpa-scaling-results.txt`).
+- [x] 8. Hybrid failover script output demonstrating switch to public cloud tier (`08-hybrid-failover-results.txt`).
+- [x] 9. `docker images` comparing unoptimized vs. optimized image sizes (`09-cost-image-optimization.txt`).

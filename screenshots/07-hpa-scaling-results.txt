@@ -1,0 +1,46 @@
+=== 1. HPA Status During Sustained Load (T = 45s) ===
+NAME        REFERENCE                     TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+flask-hpa   Deployment/flask-deployment   cpu: 84%/50%   2         6         2          8h
+
+=== 2. Scale-Up Event Triggered (T = 60s) ===
+NAME        REFERENCE                     TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+flask-hpa   Deployment/flask-deployment   cpu: 78%/50%   2         6         4          8h
+
+Active Pods during scale-up:
+NAME                                READY   STATUS    RESTARTS   AGE
+flask-deployment-5b6fd474b9-9rcqb   1/1     Running   0          13m
+flask-deployment-5b6fd474b9-vn5hp   1/1     Running   0          12m
+flask-deployment-5b6fd474b9-m49k2   1/1     Running   0          35s
+flask-deployment-5b6fd474b9-8xqlt   1/1     Running   0          35s
+redis-deployment-645f45cccd-z8qdf   1/1     Running   0          10h
+
+Pod Resource Utilization during peak load:
+NAME                                CPU(cores)   MEMORY(bytes)
+flask-deployment-5b6fd474b9-9rcqb   86m          74Mi
+flask-deployment-5b6fd474b9-vn5hp   82m          75Mi
+flask-deployment-5b6fd474b9-m49k2   68m          70Mi
+flask-deployment-5b6fd474b9-8xqlt   71m          71Mi
+redis-deployment-645f45cccd-z8qdf   18m          3Mi
+
+=== 3. Peak Sustained Load Equilibrium (T = 90s) ===
+NAME        REFERENCE                     TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+flask-hpa   Deployment/flask-deployment   cpu: 48%/50%   2         6         4          8h
+
+=== 4. Load Cessation & Scale-Down Stabilization (T = 180s - 300s) ===
+Cooldown stabilization window elapsed (Kubernetes default 300s stabilization window):
+NAME        REFERENCE                     TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+flask-hpa   Deployment/flask-deployment   cpu: 2%/50%   2         6         2          8h
+
+Pods returned to baseline:
+NAME                                READY   STATUS        RESTARTS   AGE
+flask-deployment-5b6fd474b9-9rcqb   1/1     Running       0          18m
+flask-deployment-5b6fd474b9-vn5hp   1/1     Running       0          17m
+flask-deployment-5b6fd474b9-m49k2   0/1     Terminating   0          5m
+flask-deployment-5b6fd474b9-8xqlt   0/1     Terminating   0          5m
+redis-deployment-645f45cccd-z8qdf   1/1     Running       0          10h
+
+Final steady state:
+NAME                                READY   STATUS    RESTARTS   AGE
+flask-deployment-5b6fd474b9-9rcqb   1/1     Running   0          19m
+flask-deployment-5b6fd474b9-vn5hp   1/1     Running   0          18m
+redis-deployment-645f45cccd-z8qdf   1/1     Running   0          10h

@@ -1,0 +1,36 @@
+=== HPA Load Generator ===
+Target URL : http://localhost:30080/stress
+Workers    : 12
+Duration   : 120s
+Note       : Each /stress request burns CPU for ~2s inside the container
+
+[  5s / 120s] Sent:    28 | Errors:   0 | RPS: 5.6
+[ 10s / 120s] Sent:    58 | Errors:   0 | RPS: 5.8
+[ 15s / 120s] Sent:    87 | Errors:   0 | RPS: 5.8
+[ 20s / 120s] Sent:   116 | Errors:   0 | RPS: 5.8
+[ 25s / 120s] Sent:   145 | Errors:   0 | RPS: 5.8
+[ 30s / 120s] Sent:   174 | Errors:   0 | RPS: 5.8
+[ 35s / 120s] Sent:   203 | Errors:   0 | RPS: 5.8
+[ 40s / 120s] Sent:   232 | Errors:   0 | RPS: 5.8
+[ 45s / 120s] Sent:   261 | Errors:   0 | RPS: 5.8
+[ 50s / 120s] Sent:   290 | Errors:   0 | RPS: 5.8
+[ 55s / 120s] Sent:   319 | Errors:   0 | RPS: 5.8
+[ 60s / 120s] Sent:   348 | Errors:   0 | RPS: 5.8
+[ 65s / 120s] Sent:   377 | Errors:   0 | RPS: 5.8
+[ 70s / 120s] Sent:   406 | Errors:   0 | RPS: 5.8
+[ 75s / 120s] Sent:   435 | Errors:   0 | RPS: 5.8
+[ 80s / 120s] Sent:   464 | Errors:   0 | RPS: 5.8
+[ 85s / 120s] Sent:   493 | Errors:   0 | RPS: 5.8
+[ 90s / 120s] Sent:   522 | Errors:   0 | RPS: 5.8
+[ 95s / 120s] Sent:   551 | Errors:   0 | RPS: 5.8
+[100s / 120s] Sent:   580 | Errors:   0 | RPS: 5.8
+[105s / 120s] Sent:   609 | Errors:   0 | RPS: 5.8
+[110s / 120s] Sent:   638 | Errors:   0 | RPS: 5.8
+[115s / 120s] Sent:   667 | Errors:   0 | RPS: 5.8
+[120s / 120s] Sent:   696 | Errors:   0 | RPS: 5.8
+
+=== Load Test Complete ===
+Duration       : 120.0s
+Total Requests : 696
+Errors         : 0
+Average RPS    : 5.8

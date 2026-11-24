@@ -9,5 +9,5 @@ data:
   PORT: "5000"
   ENVIRONMENT_NAME: "Kubernetes Cluster (Production)"
   APP_VERSION: "v1.0.0"
-  ENABLE_STRESS_ENDPOINT: "true"
+  ENABLE_STRESS_ENDPOINT: "false"
   STRESS_DURATION_S: "2"
